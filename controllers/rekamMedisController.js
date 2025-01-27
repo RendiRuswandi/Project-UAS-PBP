@@ -132,3 +132,5 @@ router.delete('/rekam_medis/:id', async (req, res) => {
 });
 
 module.exports = router;
+
+//Kelompok 1
