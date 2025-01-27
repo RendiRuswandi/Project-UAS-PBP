@@ -2,35 +2,35 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 
-// POST /konsultasiKesehatan - Membuat janji konsultasi baru
-router.post('/konsultasi', async (req, res) => {
-    const { id_pengguna, id_dokter, jadwal_konsultasi } = req.body;
+// POST /konsultasiKarir - Membuat janji konsultasi bimbingan pra kerja baru
+router.post('/karir', async (req, res) => {
+    const { id_pelamar, id_mentor, jadwal_konsultasi } = req.body;
 
-    if (!id_pengguna || !id_dokter || !jadwal_konsultasi) {
+    if (!id_pelamar || !id_mentor || !jadwal_konsultasi) {
         return res.status(400).json({ message: 'Semua field harus diisi!' });
     }
 
     try {
         await db.promise().query(
             `
-            INSERT INTO janji_konsultasi (id_pengguna, id_dokter, jadwal_konsultasi) 
+            INSERT INTO janji_konsultasi (id_pelamar, id_mentor, jadwal_konsultasi) 
             VALUES (?, ?, ?)
             `,
-            [id_pengguna, id_dokter, jadwal_konsultasi]
+            [id_pelamar, id_mentor, jadwal_konsultasi]
         );
-        res.status(201).json({ message: 'Janji konsultasi berhasil dibuat' });
+        res.status(201).json({ message: 'Janji konsultasi bimbingan pra kerja berhasil dibuat' });
     } catch (error) {
         console.error('Error creating appointment:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 
-// GET /konsultasiKesehatan - Mengambil daftar janji konsultasi untuk pengguna tertentu
-router.get('/konsultasi', async (req, res) => {
-    const { id_pengguna } = req.query; // ID pengguna diambil dari query parameter
+// GET /konsultasiKarir - Mengambil daftar janji konsultasi untuk pelamar tertentu
+router.get('/karir', async (req, res) => {
+    const { id_pelamar } = req.query;
 
-    if (!id_pengguna) {
-        return res.status(400).json({ message: 'ID pengguna harus disertakan!' });
+    if (!id_pelamar) {
+        return res.status(400).json({ message: 'ID pelamar harus disertakan!' });
     }
 
     try {
@@ -38,29 +38,29 @@ router.get('/konsultasi', async (req, res) => {
             `
             SELECT 
                 jk.id,
-                jk.id_pengguna,
-                p.nama AS nama_pengguna,
-                jk.id_dokter,
-                d.nama AS nama_dokter,
+                jk.id_pelamar,
+                p.nama AS nama_pelamar,
+                jk.id_mentor,
+                m.nama AS nama_mentor,
                 jk.jadwal_konsultasi,
                 jk.status,
                 jk.dibuat_pada
             FROM janji_konsultasi jk
-            JOIN pengguna p ON jk.id_pengguna = p.id
-            JOIN pengguna d ON jk.id_dokter = d.id
-            WHERE jk.id_pengguna = ?
+            JOIN pelamar p ON jk.id_pelamar = p.id
+            JOIN mentor m ON jk.id_mentor = m.id
+            WHERE jk.id_pelamar = ?
             `,
-            [id_pengguna]
+            [id_pelamar]
         );
         res.status(200).json(results);
     } catch (error) {
-        console.error('Error fetching konsultasiKesehatan:', error);
+        console.error('Error fetching career consultations:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 
-// GET /konsultasiKesehatan/{id} - Mengambil detail janji konsultasi berdasarkan ID
-router.get('/konsultasi/:id', async (req, res) => {
+// GET /konsultasiKarir/{id} - Mengambil detail janji konsultasi berdasarkan ID
+router.get('/karir/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -68,16 +68,16 @@ router.get('/konsultasi/:id', async (req, res) => {
             `
             SELECT 
                 jk.id,
-                jk.id_pengguna,
-                p.nama AS nama_pengguna,
-                jk.id_dokter,
-                d.nama AS nama_dokter,
+                jk.id_pelamar,
+                p.nama AS nama_pelamar,
+                jk.id_mentor,
+                m.nama AS nama_mentor,
                 jk.jadwal_konsultasi,
                 jk.status,
                 jk.dibuat_pada
             FROM janji_konsultasi jk
-            JOIN pengguna p ON jk.id_pengguna = p.id
-            JOIN pengguna d ON jk.id_dokter = d.id
+            JOIN pelamar p ON jk.id_pelamar = p.id
+            JOIN mentor m ON jk.id_mentor = m.id
             WHERE jk.id = ?
             `,
             [id]
@@ -89,13 +89,13 @@ router.get('/konsultasi/:id', async (req, res) => {
 
         res.status(200).json(results[0]);
     } catch (error) {
-        console.error('Error fetching appointment details:', error);
+        console.error('Error fetching consultation details:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 
-// PUT /konsultasiKesehatan/{id} - Mengupdate janji konsultasi (misalnya mengubah jadwal)
-router.put('/konsultasi/:id', async (req, res) => {
+// PUT /konsultasiKarir/{id} - Mengupdate janji konsultasi bimbingan pra kerja
+router.put('/karir/:id', async (req, res) => {
     const { id } = req.params;
     const { jadwal_konsultasi, status } = req.body;
 
@@ -118,15 +118,15 @@ router.put('/konsultasi/:id', async (req, res) => {
             return res.status(404).json({ message: 'Janji konsultasi tidak ditemukan!' });
         }
 
-        res.status(200).json({ message: 'Janji konsultasi berhasil diperbarui' });
+        res.status(200).json({ message: 'Janji konsultasi bimbingan pra kerja berhasil diperbarui' });
     } catch (error) {
-        console.error('Error updating appointment:', error);
+        console.error('Error updating consultation:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 
-// DELETE /konsultasiKesehatan/{id} - Menghapus janji konsultasi
-router.delete('/konsultasi/:id', async (req, res) => {
+// DELETE /konsultasiKarir/{id} - Menghapus janji konsultasi bimbingan pra kerja
+router.delete('/karir/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -141,13 +141,11 @@ router.delete('/konsultasi/:id', async (req, res) => {
             return res.status(404).json({ message: 'Janji konsultasi tidak ditemukan!' });
         }
 
-        res.status(200).json({ message: 'Janji konsultasi berhasil dihapus' });
+        res.status(200).json({ message: 'Janji konsultasi bimbingan pra kerja berhasil dihapus' });
     } catch (error) {
-        console.error('Error deleting appointment:', error);
+        console.error('Error deleting consultation:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 
 module.exports = router;
-
-//Kelompok 1

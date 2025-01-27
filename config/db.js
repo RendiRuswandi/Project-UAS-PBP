@@ -4,7 +4,7 @@ const connection = mysql.createConnection({
   host: 'localhost',       
   user: 'root',
   password: '',           
-  database: 'konsultasi_kesehatan'
+  database: 'konsultasi_karir' // Mengubah nama database agar sesuai dengan tema baru
 });
 
 connection.connect((err) => {
@@ -12,8 +12,7 @@ connection.connect((err) => {
     console.error('Kesalahan koneksi ke database: ', err);
     return;
   }
-  console.log('Koneksi ke database berhasil!');
+  console.log('Koneksi ke database jasa pencari lowongan pekerjaan dan konsultasi bimbingan pra kerja berhasil!');
 });
 
 module.exports = connection;
-// kelompok 1

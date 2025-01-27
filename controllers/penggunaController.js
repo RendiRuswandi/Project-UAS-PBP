@@ -4,9 +4,9 @@ const db = require('../config/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-
 const SECRET_KEY = 'your_secret_key'; 
 
+// Registrasi pengguna untuk platform pencari lowongan kerja dan konsultasi pra-kerja
 router.post('/register', async (req, res) => {
     const { nama, email, kata_sandi, peran } = req.body;
 
@@ -15,19 +15,18 @@ router.post('/register', async (req, res) => {
     }
 
     try {
- 
         const [existingUser] = await db.promise().query('SELECT * FROM pengguna WHERE email = ?', [email]);
         if (existingUser.length > 0) {
             return res.status(400).json({ message: 'Email sudah digunakan!' });
         }
 
-
         const hashedPassword = await bcrypt.hash(kata_sandi, 10);
 
-        await db.promise().query('INSERT INTO pengguna (nama, email, kata_sandi) VALUES (?, ?, ?)', [
+        await db.promise().query('INSERT INTO pengguna (nama, email, kata_sandi, peran) VALUES (?, ?, ?, ?)', [
             nama,
             email,
             hashedPassword,
+            peran || 'pelamar'
         ]);
 
         res.status(201).json({ message: 'Pengguna berhasil didaftarkan' });
@@ -37,6 +36,7 @@ router.post('/register', async (req, res) => {
     }
 });
 
+// Login pengguna
 router.post('/login', async (req, res) => {
     const { email, kata_sandi } = req.body;
 
@@ -56,7 +56,7 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ message: 'Kata sandi salah!' });
         }
 
-        const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.id, email: user.email, peran: user.peran }, SECRET_KEY, { expiresIn: '1h' });
 
         res.status(200).json({
             message: 'Login berhasil',
@@ -68,7 +68,7 @@ router.post('/login', async (req, res) => {
     }
 });
 
-
+// Mendapatkan daftar pengguna
 router.get('/pengguna', async (req, res) => {
     const authHeader = req.headers.authorization;
 
@@ -89,6 +89,7 @@ router.get('/pengguna', async (req, res) => {
     }
 });
 
+// Mendapatkan detail pengguna berdasarkan ID
 router.get('/pengguna/:id', async (req, res) => {
     const authHeader = req.headers.authorization;
 
@@ -114,6 +115,7 @@ router.get('/pengguna/:id', async (req, res) => {
     }
 });
 
+// Mengupdate informasi pengguna
 router.put('/pengguna/:id', async (req, res) => {
     const authHeader = req.headers.authorization;
 
@@ -144,6 +146,7 @@ router.put('/pengguna/:id', async (req, res) => {
     }
 });
 
+// Menghapus pengguna dari platform pencari kerja dan konsultasi
 router.delete('/pengguna/:id', async (req, res) => {
     const authHeader = req.headers.authorization;
 
@@ -156,7 +159,6 @@ router.delete('/pengguna/:id', async (req, res) => {
 
     try {
         const decoded = jwt.verify(token, SECRET_KEY);
-
 
         const [result] = await db.promise().query('DELETE FROM pengguna WHERE id = ?', [userId]);
 
@@ -171,6 +173,4 @@ router.delete('/pengguna/:id', async (req, res) => {
     }
 });
 
-module.exports = router;
-
-//Kelompok 1
+module.exports = router; 

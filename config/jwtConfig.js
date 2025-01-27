@@ -1,6 +1,4 @@
 module.exports = {
-    secret: 'your_jwt_secret_key', // Ganti dengan kunci rahasia Anda
-    expiresIn: '1h',             // Token valid selama 1 jam
-  };
-
-  //kelompok 1
+  secret: 'your_jwt_secret_key', // Kunci rahasia untuk otentikasi pengguna 
+  expiresIn: '1h',              // Token berlaku selama 1 jam untuk sesi pengguna 
+};

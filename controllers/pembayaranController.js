@@ -2,42 +2,42 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 
-// POST /pembayaran - Membuat Pembayaran Baru
+// POST /pembayaran - Membuat pembayaran untuk layanan bimbingan pra kerja
 router.post('/pembayaran', async (req, res) => {
-    const { id_janji_konsultasi, jumlah, status } = req.body;
+    const { id_konsultasi_karir, jumlah, status } = req.body;
 
-    if (!id_janji_konsultasi || !jumlah) {
-        return res.status(400).json({ message: 'Field id_janji_konsultasi dan jumlah harus diisi!' });
+    if (!id_konsultasi_karir || !jumlah) {
+        return res.status(400).json({ message: 'Field id_konsultasi_karir dan jumlah harus diisi!' });
     }
 
     try {
         await db.promise().query(
             `
-            INSERT INTO pembayaran (id_janji_konsultasi, jumlah, status) 
+            INSERT INTO pembayaran (id_konsultasi_karir, jumlah, status) 
             VALUES (?, ?, ?)
             `,
-            [id_janji_konsultasi, jumlah, status || 'tertunda']
+            [id_konsultasi_karir, jumlah, status || 'tertunda']
         );
-        res.status(201).json({ message: 'Pembayaran berhasil dibuat' });
+        res.status(201).json({ message: 'Pembayaran untuk konsultasi bimbingan pra kerja berhasil dibuat' });
     } catch (error) {
         console.error('Error creating pembayaran:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 
-// GET /pembayaran - Mengambil Semua Pembayaran
+// GET /pembayaran - Mengambil semua pembayaran layanan bimbingan pra kerja
 router.get('/pembayaran', async (req, res) => {
     try {
         const [results] = await db.promise().query(
             `
             SELECT 
                 p.id,
-                p.id_janji_konsultasi,
+                p.id_konsultasi_karir,
                 p.jumlah,
                 p.status,
                 p.dibuat_pada
             FROM pembayaran p
-            JOIN janji_konsultasi jk ON p.id_janji_konsultasi = jk.id
+            JOIN janji_konsultasi jk ON p.id_konsultasi_karir = jk.id
             `
         );
         res.status(200).json(results);
@@ -47,7 +47,7 @@ router.get('/pembayaran', async (req, res) => {
     }
 });
 
-// GET /pembayaran/{id} - Mengambil Detail Pembayaran
+// GET /pembayaran/{id} - Mengambil detail pembayaran berdasarkan ID
 router.get('/pembayaran/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -56,12 +56,12 @@ router.get('/pembayaran/:id', async (req, res) => {
             `
             SELECT 
                 p.id,
-                p.id_janji_konsultasi,
+                p.id_konsultasi_karir,
                 p.jumlah,
                 p.status,
                 p.dibuat_pada
             FROM pembayaran p
-            JOIN janji_konsultasi jk ON p.id_janji_konsultasi = jk.id
+            JOIN janji_konsultasi jk ON p.id_konsultasi_karir = jk.id
             WHERE p.id = ?
             `,
             [id]
@@ -78,7 +78,7 @@ router.get('/pembayaran/:id', async (req, res) => {
     }
 });
 
-// PUT /pembayaran/{id} - Memperbarui Pembayaran
+// PUT /pembayaran/{id} - Memperbarui pembayaran layanan bimbingan pra kerja
 router.put('/pembayaran/:id', async (req, res) => {
     const { id } = req.params;
     const { jumlah, status } = req.body;
@@ -109,7 +109,7 @@ router.put('/pembayaran/:id', async (req, res) => {
     }
 });
 
-// DELETE /pembayaran/{id} - Menghapus Pembayaran
+// DELETE /pembayaran/{id} - Menghapus pembayaran layanan bimbingan pra kerja
 router.delete('/pembayaran/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -133,5 +133,3 @@ router.delete('/pembayaran/:id', async (req, res) => {
 });
 
 module.exports = router;
-
-//Kelompok 1
