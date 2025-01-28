@@ -13,7 +13,7 @@ router.post('/lowongan', async (req, res) => {
     try {
         await db.promise().query(
             `
-            INSERT INTO lowongan_pekerjaan (id_perusahaan, deskripsi) 
+            INSERT INTO lowongan (id_perusahaan, deskripsi) 
             VALUES (?, ?)
             `,
             [id_perusahaan, deskripsi]
@@ -90,7 +90,7 @@ router.put('/lowongan/:id', async (req, res) => {
     try {
         const [result] = await db.promise().query(
             `
-            UPDATE lowongan_pekerjaan 
+            UPDATE lowongan
             SET deskripsi = ?
             WHERE id = ?
             `,
@@ -115,7 +115,7 @@ router.delete('/lowongan/:id', async (req, res) => {
     try {
         const [result] = await db.promise().query(
             `
-            DELETE FROM lowongan_pekerjaan WHERE id = ?
+            DELETE FROM lowongan WHERE id = ?
             `,
             [id]
         );
