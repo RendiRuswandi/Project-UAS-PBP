@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 app.use('/api', penggunaController);
 app.use('/api', lowonganController);
 app.use('/api', konsultasiKarirController);
-app.use('/api', pembayaranController); 
+app.use('/api', pembayaranController);
 
 app.listen(PORT, () => {
   console.log(`Server berjalan di http://localhost:${PORT} untuk layanan pencarian kerja dan bimbingan karir`);
